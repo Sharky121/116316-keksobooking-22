@@ -1,4 +1,4 @@
-const getRandomIntInclusive = (min = 0, max = 1) => {
+export const getRandomIntInclusive = (min = 0, max = 1) => {
   if (max === undefined) {
     [min, max] = [0, min];
   }
@@ -18,7 +18,7 @@ const getRandomIntInclusive = (min = 0, max = 1) => {
   return Math.floor(Math.random() * (max - min + 1) + min);
 };
 
-const getRandomFloatInclusive = (min = 0, max = 1, precision = 0) => {
+export const getRandomFloatInclusive = (min = 0, max = 1, precision = 0) => {
   if (max === undefined) {
     [min, max] = [0, min];
   }
@@ -38,11 +38,11 @@ const getRandomFloatInclusive = (min = 0, max = 1, precision = 0) => {
   return (Math.random() * (max - min + 1) + min).toFixed(precision);
 };
 
-const getRandomArrayElement = (elements) => {
+export const getRandomArrayElement = (elements) => {
   return elements[getRandomIntInclusive(elements.length - 1)];
 };
 
-const getRandomArray = (array) => {
+export const getRandomArray = (array) => {
   const newArray = array.filter(() => {
     return getRandomIntInclusive();
   });
@@ -52,4 +52,30 @@ const getRandomArray = (array) => {
     : array;
 };
 
-export {getRandomIntInclusive, getRandomFloatInclusive, getRandomArrayElement, getRandomArray};
+export const getRandomArrayFrom = (array) => {
+  return new Array(getRandomIntInclusive(10))
+    .fill('')
+    .map(() => {
+      return array[getRandomIntInclusive(array.length - 1)];
+    });
+};
+
+export const renderElement = (data, element, content, property) => {
+  if (data) {
+    switch (property) {
+      case 'textContent':
+        element.textContent = content;
+        break;
+      case 'innerHTML':
+        element.innerHTML = content;
+        break;
+      case 'src':
+        element.src = content;
+        break;
+      default:
+        throw new Error(`Ошибка! Неизвестное свойство ${property}`);
+    }
+  } else {
+    element.remove();
+  }
+}

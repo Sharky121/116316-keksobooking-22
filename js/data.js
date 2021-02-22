@@ -1,5 +1,5 @@
-import {Coords, Offer} from './const.js';
-import {getRandomIntInclusive, getRandomFloatInclusive, getRandomArrayElement, getRandomArray} from './util.js';
+import {ADS_COUNT, Coords, Offer} from './consts.js';
+import {getRandomIntInclusive, getRandomFloatInclusive, getRandomArrayElement, getRandomArray, getRandomArrayFrom} from './utils.js';
 
 const getCoords = () => {
   return {
@@ -26,7 +26,7 @@ const createAd = () => {
       checkout: getRandomArrayElement(Offer.CHECKS),
       features: getRandomArray(Offer.FEATURES),
       description: getRandomArrayElement(Offer.DESCRIPTION),
-      photos: getRandomArray(Offer.PHOTOS),
+      photos: getRandomArrayFrom(Offer.PHOTOS),
     },
     location: {
       x: coords.x,
@@ -35,4 +35,6 @@ const createAd = () => {
   }
 };
 
-export {createAd};
+export const createCards = () => new Array(ADS_COUNT)
+  .fill('')
+  .map(() => createAd());
