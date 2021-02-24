@@ -1,8 +1,16 @@
-import {ADS_COUNT} from './const.js';
-import {createAd} from './data.js';
+import {createCards} from './data.js';
+import {createCardTemplate} from './card-template.js';
 
-const ads = new Array(ADS_COUNT)
-  .fill('')
-  .map(() => createAd());
+const mapCanvasElement = document.querySelector('#map-canvas');
+const cardTemplateElement = document.querySelector('#card').content.querySelector('.popup');
+const cardsTemplateFragment = document.createDocumentFragment();
 
-ads;
+const cards = createCards();
+
+cards.forEach((card) => {
+  const cardTemplate = createCardTemplate(card, cardTemplateElement);
+
+  cardsTemplateFragment.appendChild(cardTemplate);
+});
+
+mapCanvasElement.appendChild(cardsTemplateFragment.firstElementChild);
