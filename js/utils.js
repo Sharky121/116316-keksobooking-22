@@ -1,3 +1,5 @@
+import {RenderProperty} from './consts.js';
+
 export const getRandomIntInclusive = (min = 0, max = 1) => {
   if (max === undefined) {
     [min, max] = [0, min];
@@ -63,13 +65,13 @@ export const getRandomArrayFrom = (array) => {
 export const renderElement = (data, element, content, property) => {
   if (data) {
     switch (property) {
-      case 'textContent':
+      case RenderProperty.TEXT_CONTENT:
         element.textContent = content;
         break;
-      case 'innerHTML':
+      case RenderProperty.INNER_HTML:
         element.innerHTML = content;
         break;
-      case 'src':
+      case RenderProperty.SRC:
         element.src = content;
         break;
       default:
