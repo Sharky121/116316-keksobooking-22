@@ -1,4 +1,5 @@
 export const ADS_COUNT = 10;
+export const MIN_ATTRIBUTE_INPUT = 'min';
 
 export const Coords = {
   X_MIN: 35.65000,
@@ -30,4 +31,17 @@ export const Offer = {
     'Description 9',
     'Description 10',
   ],
+};
+
+export const RenderProperty = {
+  TEXT_CONTENT: 'textContent',
+  INNER_HTML: 'innerHTML',
+  SRC: 'src',
+};
+
+export const typeToPrice = {
+  'flat': '1000',
+  'house': '5000',
+  'bungalow': '0',
+  'palace': '10000',
 };
