@@ -1,8 +1,8 @@
-import {MIN_ATTRIBUTE_INPUT, typeToPrice} from './consts.js';
+import {MIN_ATTRIBUTE_INPUT, TypeToPrice} from './consts.js';
 
 export const bindSelectToInputHandler = (select, input) => {
-  input.setAttribute(MIN_ATTRIBUTE_INPUT, typeToPrice[select.value]);
-  input.placeholder = typeToPrice[select.value];
+  input.setAttribute(MIN_ATTRIBUTE_INPUT, TypeToPrice[select.value]);
+  input.placeholder = TypeToPrice[select.value];
 }
 
 export const syncSelectElementsHandler = (firstSelect, secondSelect) => {

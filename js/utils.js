@@ -1,10 +1,6 @@
 import {RenderProperty} from './consts.js';
 
 export const getRandomIntInclusive = (min = 0, max = 1) => {
-  if (max === undefined) {
-    [min, max] = [0, min];
-  }
-
   if (min > max) {
     [min, max] = [max, min];
   }
@@ -21,10 +17,6 @@ export const getRandomIntInclusive = (min = 0, max = 1) => {
 };
 
 export const getRandomFloatInclusive = (min = 0, max = 1, precision = 0) => {
-  if (max === undefined) {
-    [min, max] = [0, min];
-  }
-
   if (min > max) {
     [min, max] = [max, min];
   }
