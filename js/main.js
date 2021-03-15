@@ -1,43 +1,53 @@
 import {createCards} from './data.js';
-import {createCardTemplate} from './card-template.js';
 import {bindSelectToInputHandler, syncSelectElementsHandler} from './form.js';
+import {renderMap} from './map.js';
+import {togglePageState} from './page-state.js';
 
-const FormElement = {
-  TYPE: document.querySelector('#type'),
-  PRICE: document.querySelector('#price'),
-  TIME_IN: document.querySelector('#timein'),
-  TIME_OUT: document.querySelector('#timeout'),
-  TIME: document.querySelector('.ad-form__element--time').querySelectorAll('select'),
+// ОСНОВНЫЕ ЭЛЕМЕНТЫ
+const adFormElement = document.querySelector('.ad-form');
+const filtersFormElement = document.querySelector('.map__filters');
+const mapCanvasElement = document.querySelector('#map-canvas');
+
+// ШАБЛОНЫ
+const cardTemplateElement = document.querySelector('#card').content.querySelector('.popup');
+
+// ЭЛЕМЕНТЫ ОСНОВНОЙ ФОРМЫ
+const FormFieldElement = {
+  TYPE: adFormElement.querySelector('#type'),
+  PRICE: adFormElement.querySelector('#price'),
+  TIME_IN: adFormElement.querySelector('#timein'),
+  TIME_OUT: adFormElement.querySelector('#timeout'),
+  ADDRESS: adFormElement.querySelector('#address'),
 };
 
-const mapCanvasElement = document.querySelector('#map-canvas');
-const cardTemplateElement = document.querySelector('#card').content.querySelector('.popup');
-const cardsTemplateFragment = document.createDocumentFragment();
-
+// СОЗДАЁТ КАРТОЧКИ ОБЪЯВЛЕНИЙ
 const cards = createCards();
 
-cards.forEach((card) => {
-  const cardTemplate = createCardTemplate(card, cardTemplateElement);
+// ВЫСТАВЛЯЕТ НАЧАЛЬНОЕ СОСТОЯНИЕ СТРАНИЦЫ
+togglePageState(false, adFormElement, filtersFormElement);
+bindSelectToInputHandler(FormFieldElement.TYPE, FormFieldElement.PRICE);
 
-  cardsTemplateFragment.appendChild(cardTemplate);
+// РЕНДЕРИТ КАРТУ
+renderMap(
+  mapCanvasElement,
+  cards,
+  cardTemplateElement,
+  FormFieldElement.ADDRESS,
+  togglePageState.bind({}, true, adFormElement, filtersFormElement),
+);
+
+// ВЕШАЕТ ОБРАБОТЧИК НА SELECT ТИПА ЖИЛЬЯ
+FormFieldElement.TYPE.addEventListener('change', (evt) => {
+  bindSelectToInputHandler(evt.target, FormFieldElement.PRICE);
 });
 
-mapCanvasElement.appendChild(cardsTemplateFragment.firstElementChild);
-
-// Инициализирует начальное состояние типа жилья и цены за ночь
-bindSelectToInputHandler(FormElement.TYPE, FormElement.PRICE);
-
-// Вешает обработчик на select типа жилья
-FormElement.TYPE.addEventListener('change', (evt) => {
-  bindSelectToInputHandler(evt.target, FormElement.PRICE);
+// ВЕШАЕТ ОБРАБОТЧИК НА SELECT ВРЕМЯ ЗАЕЗДА
+FormFieldElement.TIME_IN.addEventListener('change', (evt) => {
+  syncSelectElementsHandler(evt.target, FormFieldElement.TIME_OUT);
 });
 
-// Вешает обработчик на select время заезда
-FormElement.TIME_IN.addEventListener('change', (evt) => {
-  syncSelectElementsHandler(evt.target, FormElement.TIME_OUT);
+// ВЕШАЕТ ОБРАБОТЧИК НА SELECT ВРЕМЯ ВЫЕЗДА
+FormFieldElement.TIME_OUT.addEventListener('change', (evt) => {
+  syncSelectElementsHandler(evt.target, FormFieldElement.TIME_IN);
 });
 
-// Вешает обработчик на select время выезда
-FormElement.TIME_OUT.addEventListener('change', (evt) => {
-  syncSelectElementsHandler(evt.target, FormElement.TIME_IN);
-});
