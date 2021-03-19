@@ -1,4 +1,8 @@
-import {RenderProperty} from './consts.js';
+const RenderProperty = {
+  TEXT_CONTENT: 'textContent',
+  INNER_HTML: 'innerHTML',
+  SRC: 'src',
+};
 
 export const getRandomIntInclusive = (min = 0, max = 1) => {
   if (min > max) {
