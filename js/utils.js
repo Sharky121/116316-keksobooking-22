@@ -4,6 +4,11 @@ const RenderProperty = {
   SRC: 'src',
 };
 
+const Key = {
+  ESC: 'Esc',
+  ESCAPE: 'Escape',
+}
+
 export const getRandomIntInclusive = (min = 0, max = 1) => {
   if (min > max) {
     [min, max] = [max, min];
@@ -77,3 +82,7 @@ export const renderElement = (data, element, content, property) => {
     element.remove();
   }
 }
+
+export const isEscEvent = (evt) => {
+  return evt.key === Key.ESCAPE || evt.key === Key.ESC;
+};

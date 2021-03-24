@@ -1,8 +1,12 @@
+/* global L:readonly */
+import {TokyoCoords} from './consts.js';
+
 const MIN_ATTRIBUTE_INPUT = 'min';
 const RADIX = 10;
 const MIN_NAME_LENGTH = 30;
 const MAX_NAME_LENGTH = 100;
 const MAX_PRICE = 1000000;
+const PRECISION = 5;
 const VALIDITY_TEXT = 'Количество комнат не соответствует кол-ву гостей';
 
 const TypeToPrice = {
@@ -11,6 +15,7 @@ const TypeToPrice = {
   bungalow: '0',
   palace: '10000',
 };
+
 const RoomsToCapacity = {
   1 : [1],
   2 : [1, 2],
@@ -27,28 +32,36 @@ const validatePlacement = (firstSelect, secondSelect) => {
   return capacityArray.some((item) => item === parseInt(secondValue, RADIX));
 }
 
+// Синхронизация поля "Тип жилья" и "Цена за ночь"
 export const bindSelectToInputHandler = (select, input) => {
   input.setAttribute(MIN_ATTRIBUTE_INPUT, TypeToPrice[select.value]);
   input.placeholder = TypeToPrice[select.value];
 }
 
+export const bindMarkerToInputHandler = (coords, input) => {
+  const {lat, lng} = coords;
+
+  input.value = lat.toFixed(PRECISION) + ', ' + lng.toFixed(PRECISION);
+}
+
+// Синхронизация двух select-полей
 export const syncSelectElementsHandler = (firstSelect, secondSelect) => {
   secondSelect.value = firstSelect.value;
 };
 
-export const selectValidateHandler = (evt, roomsSelect, capacitySelect) => {
-  evt.preventDefault();
-
+export const selectValidateHandler = (roomsSelect, capacitySelect) => {
   const validateStatus = validatePlacement(roomsSelect, capacitySelect);
 
   if (!validateStatus) {
     roomsSelect.setCustomValidity(VALIDITY_TEXT);
     roomsSelect.reportValidity();
-  } else {
-    roomsSelect.setCustomValidity('')
+    return;
   }
+
+  roomsSelect.setCustomValidity('');
 };
 
+// Валидация поля "Заголовок объявления"
 export const titleValidateHandler = (input) => {
   input.addEventListener('input', () => {
     const valueLength = input.value.length;
@@ -60,11 +73,12 @@ export const titleValidateHandler = (input) => {
     } else {
       input.setCustomValidity('');
     }
-  });
 
-  input.reportValidity();
+    input.reportValidity();
+  });
 };
 
+// Валидация поля "Цена за ночь"
 export const priceValidateHandler = (input) => {
   input.addEventListener('input', () => {
     const valueLength = input.value.length;
@@ -82,3 +96,13 @@ export const priceValidateHandler = (input) => {
 
   input.reportValidity();
 };
+
+// Сбрасывает форму до начального состояния
+export const setFormDefault = (adFormElement, filtersFormElement, marker, input) => {
+  adFormElement.reset();
+  filtersFormElement.reset();
+
+  // Устанавливаем маркер в исходное положение
+  marker.setLatLng(L.latLng(TokyoCoords.LAT, TokyoCoords.LNG));
+  bindMarkerToInputHandler(L.latLng(TokyoCoords.LAT, TokyoCoords.LNG), input);
+}

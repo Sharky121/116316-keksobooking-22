@@ -1,11 +1,10 @@
 /* global L:readonly */
+import {TokyoCoords} from './consts.js';
 import {createCardTemplate} from './card-template.js';
+import {getData} from './fetch-api.js';
+import {showErrorAlert} from './messages.js';
+import {bindMarkerToInputHandler} from './form.js';
 
-const PRECISION = 5;
-const TokyoCoords = {
-  LAT: 35.681700,
-  LNG: 139.753882,
-}
 const MapEvents = {
   LOAD: 'load',
   MOVEEND: 'moveend',
@@ -31,13 +30,11 @@ const createCustomPopup = (card, cardTemplate) => {
   return createCardTemplate(card, cardTemplate);
 };
 
-const bindMarkerToInputHandler = (coords, input) => {
-  const {lat, lng} = coords;
+const onError = (errorMessage) => {
+  showErrorAlert(errorMessage);
+};
 
-  input.value = lat.toFixed(PRECISION) + ', ' + lng.toFixed(PRECISION);
-}
-
-export const renderMap = (container, cards, popupTemplate, inputElement, activatePage) => {
+export const renderMap = (container, popupTemplate, inputElement, activatePage) => {
   const map = L.map(container)
     .on(MapEvents.LOAD, () => {
       activatePage();
@@ -64,7 +61,7 @@ export const renderMap = (container, cards, popupTemplate, inputElement, activat
     iconAnchor: Pins.bluePin.ANCHOR_SIZE,
   });
 
-  const marker = L.marker(
+  const mainMarker = L.marker(
     {
       lat: TokyoCoords.LAT,
       lng: TokyoCoords.LNG,
@@ -75,32 +72,40 @@ export const renderMap = (container, cards, popupTemplate, inputElement, activat
     },
   );
 
-  marker.on(MapEvents.MOVEEND, (evt) => {
+  mainMarker.on(MapEvents.MOVEEND, (evt) => {
     bindMarkerToInputHandler(evt.target.getLatLng(), inputElement);
   });
 
+  mainMarker.addTo(map);
   tile.addTo(map);
-  marker.addTo(map);
-  cards.forEach((card) => {
-    const {location: {x, y}} = card;
 
-    const marker = L.marker(
-      {
-        lat: x,
-        lng: y,
-      },
-      {
-        icon: pinMarker,
-      },
-    );
+  getData(
+    (cards) => {
+      cards.forEach((card) => {
+        const {location: {lat, lng}} = card;
 
-    marker
-      .addTo(map)
-      .bindPopup(
-        createCustomPopup(card, popupTemplate),
-        {
-          keepInView: true,
-        },
-      );
-  });
+        const marker = L.marker(
+          {
+            lat: lat,
+            lng: lng,
+          },
+          {
+            icon: pinMarker,
+          },
+        );
+
+        marker
+          .addTo(map)
+          .bindPopup(
+            createCustomPopup(card, popupTemplate),
+            {
+              keepInView: true,
+            },
+          );
+      });
+    },
+    (error) => {onError(error)},
+  );
+
+  return mainMarker;
 };

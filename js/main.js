@@ -1,13 +1,21 @@
-import {createCards} from './data.js';
-import {bindSelectToInputHandler, syncSelectElementsHandler, selectValidateHandler, titleValidateHandler, priceValidateHandler} from './form.js';
+import {
+  setFormDefault,
+  bindSelectToInputHandler,
+  syncSelectElementsHandler,
+  selectValidateHandler,
+  titleValidateHandler,
+  priceValidateHandler} from './form.js';
 import {renderMap} from './map.js';
 import {togglePageState} from './page-state.js';
+import {sendData} from './fetch-api.js';
+import {renderError, renderSuccess} from './messages.js';
 
 // ОСНОВНЫЕ ЭЛЕМЕНТЫ
 const adFormElement = document.querySelector('.ad-form');
 const buttonSubmitElement = document.querySelector('.ad-form__submit');
 const filtersFormElement = document.querySelector('.map__filters');
 const mapCanvasElement = document.querySelector('#map-canvas');
+const adFormResetButton = document.querySelector('.ad-form__reset');
 
 // ШАБЛОНЫ
 const cardTemplateElement = document.querySelector('#card').content.querySelector('.popup');
@@ -24,17 +32,13 @@ const FormFieldElement = {
   CAPACITY: adFormElement.querySelector('#capacity'),
 };
 
-// СОЗДАЁТ КАРТОЧКИ ОБЪЯВЛЕНИЙ
-const cards = createCards();
-
 // ВЫСТАВЛЯЕТ НАЧАЛЬНОЕ СОСТОЯНИЕ СТРАНИЦЫ
 togglePageState(false, adFormElement, filtersFormElement);
 bindSelectToInputHandler(FormFieldElement.TYPE, FormFieldElement.PRICE);
 
 // РЕНДЕРИТ КАРТУ
-renderMap(
+const mainMarker = renderMap(
   mapCanvasElement,
-  cards,
   cardTemplateElement,
   FormFieldElement.ADDRESS,
   togglePageState.bind({}, true, adFormElement, filtersFormElement),
@@ -55,18 +59,33 @@ FormFieldElement.TIME_OUT.addEventListener('change', (evt) => {
   syncSelectElementsHandler(evt.target, FormFieldElement.TIME_IN);
 });
 
-// ОТПРАВКА И ВАЛИДАЦИЯ ФОРМ
-buttonSubmitElement.addEventListener('click', (evt) => {
-  selectValidateHandler(evt, FormFieldElement.ROOMS, FormFieldElement.CAPACITY);
+// ВАЛИДАЦИЯ ФОРМЫ
+buttonSubmitElement.addEventListener('click', () => {
   titleValidateHandler(FormFieldElement.TITLE);
+  selectValidateHandler(FormFieldElement.ROOMS, FormFieldElement.CAPACITY);
   priceValidateHandler(FormFieldElement.PRICE);
 
   FormFieldElement.ROOMS.addEventListener('change', () => {
     FormFieldElement.ROOMS.setCustomValidity('');
   });
-
-  if (adFormElement.checkValidity()) {
-    adFormElement.submit();
-  }
 });
 
+// ОТПРАВКА ФОРМЫ
+adFormElement.addEventListener('submit', (evt) => {
+  evt.preventDefault();
+
+  sendData(
+    ()=> {
+      setFormDefault(adFormElement, filtersFormElement, mainMarker, FormFieldElement.ADDRESS);
+      renderSuccess();
+    },
+    () => {
+      renderError();
+    },
+    new FormData(evt.target));
+});
+
+// ОЧИСТКА ФОРМЫ
+adFormResetButton.addEventListener('click', () => {
+  setFormDefault(adFormElement, filtersFormElement, mainMarker, FormFieldElement.ADDRESS);
+});
